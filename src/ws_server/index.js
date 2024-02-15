@@ -1,28 +1,15 @@
-import WebSocket from "ws";
 import {
     WebSocketServer
 } from "ws";
-/* import { ExtWebSocket } from "./types";
-import { games, requestProcessing } from "./utils/requestProcessing"; */
+import {
+    checkAnswer,
+} from "../modules/checkAnswer.js";
 
 
 export const sockets = [];
 
 export const start_WSS = () => {
     const WSS_PORT = 3000;
-
-    /* const wss = new WebSocketServer({
-        WSS_PORT
-    })
-
-    wss.on('connection', (ws) => {
-
-        ws.on('message', (data) => {
-            console.log('asdasd')
-        })
-
-        ws.send('Hello')
-    }) */
 
     const wss = new WebSocketServer({
             port: WSS_PORT
@@ -31,13 +18,20 @@ export const start_WSS = () => {
 
     wss.on("connection", (wsClient) => {
         console.log('connection')
+
         sockets.push(wsClient);
         wsClient.index = Math.floor(Math.random() * Date.now());
 
         wsClient.on('message', async (message) => {
-            console.log(JSON.parse(message))
+            /*  console.log('getData from Client', JSON.parse(message)) */
+            /* console.log('sockets', sockets) */
+            /* console.log(sockets) */
+            checkAnswer(message, wsClient)
+
+            /* wsClient.send(JSON.stringify(message)) */
 
         })
+
 
         wsClient.on('close', async (message) => {
             console.log('close')
