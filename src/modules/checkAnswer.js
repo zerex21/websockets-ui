@@ -55,6 +55,7 @@ export let checkAnswer = (message, wsClient) => {
     const id = frontRes.id;
     console.log('id', frontRes.id)
 
+    const DB = updateDB();
 
     switch (frontRes.type) {
         case "reg":
@@ -66,7 +67,7 @@ export let checkAnswer = (message, wsClient) => {
 
             const userName = dataFront.name;
             const userPassword = dataFront.password;
-            const DB = updateDB();
+
             const playersDB = DB.players;
             /*   let serverAnswer = {}; */
 
@@ -151,7 +152,27 @@ export let checkAnswer = (message, wsClient) => {
             break;
 
         case "create_room":
-            let createRoom = {};
+            Object.keys(DB.players).forEach(playerName => {
+                if (DB.players[playerName].wsClient === wsClient) {
+                    //userName = playerName;
+                    DB.rooms.push({
+                        roomId: DB.rooms.length,
+                        roomUsers: [{
+                            name: playerName,
+                            index: wsClient.id,
+                        }],
+                    })
+                }
+            })
+
+            const serverAnswer = {
+                type: "update_room",
+                data: JSON.stringify(DB.rooms),
+                id: 0,
+            };
+            wsClient.send(JSON.stringify(serverAnswer));
+            /* return [JSON.stringify(updRoomRes), true]; */
+            /* let createRoom = {};
             idGames += 1
             games[idGames] = activePlayers
             createRoom = {
@@ -164,17 +185,17 @@ export let checkAnswer = (message, wsClient) => {
             }
             console.log('room', games)
             wsClient.send(JSON.stringify(createRoom));
-            updateRoom();
+            updateRoom(); */
             break;
 
         case "add_player":
-            const dataRoom = JSON.parse(frontRes.data);
-            games[dataRoom.indexRoom].addPLayer(player);
+            /*  const dataRoom = JSON.parse(frontRes.data);
+             games[dataRoom.indexRoom].addPLayer(player); */
             break;
     }
 }
 
-const updateRoom = () => {
+/* const updateRoom = () => {
     const updateRoom = {
         type: "update_room",
         data: JSON.stringify(
@@ -192,7 +213,7 @@ const updateRoom = () => {
         )
     }
     sockets.map(socket => socket.send(JSON.stringify(updateRoom)));
-}
+} */
 
 /* export const updateDB = (dbInstance = DB) => {
     DB = dbInstance;
