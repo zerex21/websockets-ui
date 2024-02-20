@@ -3,10 +3,23 @@ import {
 } from "ws";
 import {
     checkAnswer,
+    initGame,
 } from "../modules/checkAnswer.js";
+import {
+    randomUUID
+} from "crypto";
 
+/* export const sockets = []; */
 
-export const sockets = [];
+let DB = {
+    players: {},
+    rooms: [],
+    games: [
+        []
+    ],
+};
+
+/* let gameId = 1; */
 
 export const start_WSS = () => {
     const WSS_PORT = 3000;
@@ -18,18 +31,23 @@ export const start_WSS = () => {
 
     wss.on("connection", (wsClient) => {
         console.log('connection')
-
-        sockets.push(wsClient);
-        wsClient.index = Math.floor(Math.random() * Date.now());
+        wsClient.id = randomUUID();
+        /*  wsClient.index = Math.floor(Math.random() * Date.now());
+         sockets.push(wsClient);
+         console.log(sockets.length) */
 
         wsClient.on('message', async (message) => {
-            /*  console.log('getData from Client', JSON.parse(message)) */
-            /* console.log('sockets', sockets) */
-            /* console.log(sockets) */
+            console.log(JSON.parse(message))
+            /* const req = JSON.parse(message.toString()) */
             checkAnswer(message, wsClient)
+            /*      console.log('getData from Client', JSON.parse(message))
+                console.log('sockets', sockets) */
 
-            /* wsClient.send(JSON.stringify(message)) */
 
+
+
+            /* wsClient.send(JSON.stringify(message))
+             */
         })
 
 
@@ -37,4 +55,10 @@ export const start_WSS = () => {
             console.log('close')
         })
     })
+}
+
+export const updateDB = (dbInstance = DB) => {
+    DB = dbInstance;
+    console.log(DB);
+    return DB;
 }
