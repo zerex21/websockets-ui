@@ -39,7 +39,7 @@ export const start_WSS = () => {
         wsClient.on('message', async (message) => {
             console.log(JSON.parse(message))
             /* const req = JSON.parse(message.toString()) */
-            checkAnswer(message, wsClient)
+            checkAnswer(message, wsClient, wss)
             /*      console.log('getData from Client', JSON.parse(message))
                 console.log('sockets', sockets) */
 
