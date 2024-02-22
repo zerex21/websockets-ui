@@ -246,6 +246,25 @@ export let checkAnswer = (message, wsClient, wss) => {
             };
             wsClient.send(JSON.stringify(updRoomRes));
             break;
+
+        case 'add_ships':
+            /*  console.log(data);
+             const DB = updateDB(); */
+            DB.games[dataFront.gameId][0] = dataFront.ships;
+
+            updateDB(DB);
+
+            const res = {
+                type: "start_game",
+                data: JSON.stringify({
+                    ships: dataFront.ships,
+                    currentPlayerIndex: dataFront.id,
+                    /* id of the player in the current game who have sent his ships */
+                }),
+                id: 0,
+            };
+            wsClient.send(JSON.stringify(res));
+            break;
     }
 }
 
