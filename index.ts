@@ -1,10 +1,10 @@
 import {
     httpServer
-} from "./src/http_server/index.js";
+} from "./src/http_server/index";
 
 import {
     start_WSS
-} from "./src/ws_server/index.js";
+} from "./src/ws_server/index";
 
 const HTTP_PORT = 8181;
 

@@ -1,9 +1,11 @@
+import { IWebSocketWithID } from './../../interfaces/interfaces';
 import {
     updateDB
-} from "../../ws_server/index.js";
+} from "../../ws_server/index";
+import { IDataFront, IDatabase } from "../../interfaces/interfaces";
 
 
-export let registration = (DB, dataFront, wsClient, id) => {
+export let registration = (DB:IDatabase, dataFront:IDataFront, wsClient:IWebSocketWithID, id:number) => {
     const userName = dataFront.name;
     const userPassword = dataFront.password;
 

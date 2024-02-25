@@ -1,13 +1,15 @@
+import { IWebSocketWithID } from './../../interfaces/interfaces';
 import WebSocket from "ws";
-
+import { WebSocketServer } from "ws";
+import { IDataFront, IDatabase } from "../../interfaces/interfaces";
 import {
     updateDB
-} from "../../ws_server/index.js";
+} from "../../ws_server/index";
 
 
-export let addUser = (DB, dataFront, wsClient, wss) => {
+export let addUser = (DB: IDatabase, dataFront: IDataFront, wsClient: IWebSocketWithID, wss: WebSocketServer) => {
     const reqRoomIndex = dataFront.indexRoom;
-    let readyToPlay = [];
+    let readyToPlay: string[] = [];
 
     DB.rooms.forEach((room, i) => {
         if (room.roomId === reqRoomIndex) {
@@ -18,38 +20,39 @@ export let addUser = (DB, dataFront, wsClient, wss) => {
             readyToPlay = [DB.rooms[i].roomUsers[0].index, DB.rooms[i].roomUsers[1].index];
         }
         if (room.roomId !== reqRoomIndex && room.roomUsers[0].name === wsClient.name) {
-            DB.rooms[i].roomUsers.splice(i); //arr.splice(i) пересмотреть
+            DB.rooms[i].roomUsers.splice(i); // Проверьте, нужно ли вам использовать splice() или нет
         }
-    })
+    });
 
     updateDB(DB);
 
-    wss.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN && client.id === readyToPlay[0]) {
+    // Преобразуем коллекцию в массив и итерируем по нему с помощью for...of цикла
+    const clientsArray = Array.from(wss.clients) as (WebSocket & IWebSocketWithID)[];
+    for (const client of clientsArray) {
+        // Проверяем, есть ли у клиента свойство id
+        if (client.readyState === WebSocket.OPEN && client.id === wsClient.id) {
             const req = {
                 type: "create_game",
                 data: JSON.stringify({
                     idGame: reqRoomIndex,
                     idPlayer: readyToPlay[1],
-
-                }),
-                id: 0,
-            };
-            client.send(JSON.stringify(req));
-        };
-        if (client.readyState === WebSocket.OPEN && client.id === readyToPlay[1]) {
-            const req = {
-                type: "create_game",
-                data: JSON.stringify({
-                    idGame: reqRoomIndex,
-                    idPlayer: readyToPlay[0],
-
                 }),
                 id: 0,
             };
             client.send(JSON.stringify(req));
         }
-    })
+        if (client.readyState === WebSocket.OPEN && client.id === wsClient.id) {
+            const req = {
+                type: "create_game",
+                data: JSON.stringify({
+                    idGame: reqRoomIndex,
+                    idPlayer: readyToPlay[0],
+                }),
+                id: 0,
+            };
+            client.send(JSON.stringify(req));
+        }
+    }
 
     const updRoomRes = {
         type: "update_room",
@@ -59,4 +62,4 @@ export let addUser = (DB, dataFront, wsClient, wss) => {
         id: 0,
     };
     wsClient.send(JSON.stringify(updRoomRes));
-}
+};

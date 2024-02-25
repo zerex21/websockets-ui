@@ -1,9 +1,11 @@
+import { IDataFront, IDatabase } from "../../interfaces/interfaces";
 import {
     updateDB
-} from "../../ws_server/index.js";
+} from "../../ws_server/index";
 
 
-export let addShip = (DB, dataFront, wsClient) => {
+
+export let addShip = (DB:IDatabase, dataFront:IDataFront, wsClient:WebSocket) => {
     DB.games[dataFront.gameId][0] = dataFront.ships;
     updateDB(DB);
 

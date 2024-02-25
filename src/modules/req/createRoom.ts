@@ -1,8 +1,11 @@
+import { IWebSocketWithID } from './../../interfaces/interfaces';
 import {
     updateDB
-} from "../../ws_server/index.js";
+} from "../../ws_server/index";
+import { IDataFront, IDatabase } from "../../interfaces/interfaces";
 
-export let createRoom = (DB, dataFront, wsClient) => {
+
+export let createRoom = (DB:IDatabase, dataFront:IDataFront, wsClient:IWebSocketWithID) => {
     Object.keys(DB.players).forEach(playerName => {
         if (DB.players[playerName].wsClient === wsClient) {
             //userName = playerName;
